@@ -58,6 +58,7 @@ public class MovementBehavior : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         distanceToTheGround = GetComponent<Collider>().bounds.extents.y + 2.0f;
 
+        //effects
         particleFire = particleFireball.transform.Find("Fire").gameObject;
         particleSmoke = particleFireball.transform.Find("Smoke 2 ").gameObject;
         particleCenterGlow = particleFireball.transform.Find("Center Glow").gameObject;
@@ -87,7 +88,6 @@ public class MovementBehavior : MonoBehaviour
         intent = camR * h + camF * v;
         playerEffects.SetRotation(intent);
         intent.y = 0.0f;
-        Vector3 movement = new Vector3(h, 0.0f, v);
 
         Move();
         CheckForNitro();
@@ -133,6 +133,7 @@ public class MovementBehavior : MonoBehaviour
             rigidBody.AddForce(new Vector3(0.0f, jumpPower, 0.0f), ForceMode.Impulse);
             playerEffects.PlayJumpEffect();
         }
+
         if (rigidBody.velocity.y < 0)
         {
             rigidBody.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1.0f) * Time.deltaTime;
@@ -170,8 +171,11 @@ public class MovementBehavior : MonoBehaviour
     {
         speedLimit = 65.0f;
         tempJoint.axis = rigidBody.velocity;
+
+        //effects
         Vector3[] positions = { transform.position, ropeDestination };
         currentRopeObject.GetComponent<LineRenderer>().SetPositions(positions);
+
         tempJoint.targetVelocity = rigidBody.velocity;
         if (tempJoint.targetVelocity.magnitude > 45.0f)
         {
