@@ -52,6 +52,9 @@ public class MovementBehavior : MonoBehaviour
 
     private Rigidbody rigidBody;
 
+    private bool boostOn;
+    private float magnitude;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -98,7 +101,9 @@ public class MovementBehavior : MonoBehaviour
         }
         CheckReleaseOfRope();
         ChangeFlameColor();
-        Debug.Log(rigidBody.velocity.magnitude);
+        //Debug.Log(rigidBody.velocity.magnitude);
+
+        magnitude = rigidBody.velocity.magnitude;
     }
 
     void CalculateCamera()
@@ -146,10 +151,11 @@ public class MovementBehavior : MonoBehaviour
 
     void CheckForNitro()
     {
-        if (Input.GetKeyDown(KeyCode.Z) && isGrounded)
+        if (boostOn && isGrounded)
         {
             playerEffects.PlayNitroEffect();
             rigidBody.velocity *= 2.0f;
+            boostOn = false;
         }
     }
 
@@ -254,6 +260,18 @@ public class MovementBehavior : MonoBehaviour
             glowMat.SetColor("_EmissionColor", previousGlowColor);
             sparksMat.SetColor("_EmissionColor", previousSparksColor);
             
+        }
+    }
+
+    private void OnTriggerEnter(Collider colr){
+        if (colr.gameObject.CompareTag("Boost")){
+            boostOn = true;
+        }
+    }
+
+    private void OnCollisionEnter(Collision coln){
+        if (coln.gameObject.CompareTag("BreakableWall") && magnitude > 50.0f){
+            coln.gameObject.active = false;
         }
     }
 }
