@@ -20,8 +20,7 @@ public class MovementBehavior : MonoBehaviour
     private Color previousSparksColor;
 
     //Camera Reference
-    public Transform cam;
-    public CameraBehaviour camBeh;
+    public Transform cammeraOne;
     private Vector3 camF;
     private Vector3 camR;
     private Vector3 intent; //intention of movement
@@ -55,12 +54,15 @@ public class MovementBehavior : MonoBehaviour
     private bool boostOn;
     private float magnitude;
 
+    private bool playerHasControl = false;
+
     // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
         distanceToTheGround = GetComponent<Collider>().bounds.extents.y + 2.0f;
-
+        rigidBody.isKinematic = true;
+        rigidBody.useGravity = false;
         //effects
         particleFire = particleFireball.transform.Find("Fire").gameObject;
         particleSmoke = particleFireball.transform.Find("Smoke 2 ").gameObject;
@@ -74,9 +76,20 @@ public class MovementBehavior : MonoBehaviour
         previousCenterGlowColor = particleCenterGlow.GetComponent<Renderer>().material.GetColor("_EmissionColor");
         previousGlowColor = particleGlow.GetComponent<Renderer>().material.GetColor("_EmissionColor");
         previousSparksColor = particleSparks.GetComponent<Renderer>().material.GetColor("_EmissionColor");
+
+        StartCoroutine(countdownToStart());
+
+
     }
 
-    
+    private IEnumerator countdownToStart()
+    {
+        yield return new WaitForSeconds(5.0f);
+        rigidBody.isKinematic = false;
+        rigidBody.useGravity = true;
+        rigidBody.AddForce(new Vector3(0.0f, jumpPower, -70.0f), ForceMode.Impulse);
+        playerHasControl = true;
+    }
 
     // Update is called once per frame
     void Update()
@@ -92,15 +105,18 @@ public class MovementBehavior : MonoBehaviour
         playerEffects.SetRotation(intent);
         intent.y = 0.0f;
 
-        Move();
-        CheckForNitro();
-        Jump();
-        if (jointIsOn)
+        if (playerHasControl)
         {
-            HandleSwing();
+            Move();
+            CheckForNitro();
+            Jump();
+            if (jointIsOn)
+            {
+                HandleSwing();
+            }
+            CheckReleaseOfRope();
+            ChangeFlameColor();
         }
-        CheckReleaseOfRope();
-        ChangeFlameColor();
         //Debug.Log(rigidBody.velocity.magnitude);
 
         magnitude = rigidBody.velocity.magnitude;
@@ -108,8 +124,8 @@ public class MovementBehavior : MonoBehaviour
 
     void CalculateCamera()
     {
-        camF = cam.forward;
-        camR = cam.right;
+        camF = cammeraOne.forward;
+        camR = cammeraOne.right;
 
         camF.y = 0;
         camR.y = 0;
@@ -266,12 +282,24 @@ public class MovementBehavior : MonoBehaviour
     private void OnTriggerEnter(Collider colr){
         if (colr.gameObject.CompareTag("Boost")){
             boostOn = true;
+        }       
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("WallOpener"))
+        {
+            if (rigidBody.velocity.magnitude >= 50.0f && jointIsOn)
+            {
+                other.gameObject.GetComponent<MovingDoorBehavior>().openTheDoor();
+            }
         }
     }
 
     private void OnCollisionEnter(Collision coln){
         if (coln.gameObject.CompareTag("BreakableWall") && magnitude > 50.0f){
-            coln.gameObject.active = false;
+            //coln.gameObject.active = false;
+            coln.gameObject.GetComponent<BreakableWallBehaviour>().IncreaseBreakingState();
         }
     }
 }
