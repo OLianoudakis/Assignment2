@@ -5,6 +5,8 @@ using UnityEngine;
 public class MovementBehavior : MonoBehaviour
 {
     public AdjustPosition playerEffects;
+    public CanvasGroup gameOverCanvas;
+    public CanvasGroup victoryCanvas;
 
     public GameObject particleFireball;
     private Color previousFireballColor;
@@ -55,6 +57,7 @@ public class MovementBehavior : MonoBehaviour
     private float magnitude;
 
     private bool playerHasControl = false;
+    private bool victoryAchieved = false;
 
     // Start is called before the first frame update
     void Start()
@@ -121,7 +124,10 @@ public class MovementBehavior : MonoBehaviour
 
         magnitude = rigidBody.velocity.magnitude;
 
-        CheckForDeath();
+        if (!victoryAchieved)
+            CheckForDeath();
+        else
+            DoVictorySequence();
     }
 
     void CheckForDeath()
@@ -134,7 +140,22 @@ public class MovementBehavior : MonoBehaviour
 
     void DoDeathSequence()
     {
-        Application.LoadLevel(Application.loadedLevel);
+        if (gameOverCanvas.alpha < 1.0f)
+            gameOverCanvas.alpha += 0.01f;
+
+        if (Input.GetMouseButtonDown(0))
+            Application.LoadLevel(0);
+    }
+
+    void DoVictorySequence()
+    {
+        Screen.lockCursor = false;
+
+        if (victoryCanvas.alpha < 1.0f)
+            victoryCanvas.alpha += 0.01f;
+
+        if (Input.GetMouseButtonDown(0))
+            Application.LoadLevel(0);
     }
 
     void CalculateCamera()
@@ -295,9 +316,15 @@ public class MovementBehavior : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider colr){
-        if (colr.gameObject.CompareTag("Boost")){
+        if (colr.gameObject.CompareTag("Boost"))
+        {
             boostOn = true;
-        }       
+        }
+
+        if (colr.gameObject.CompareTag("EndGoal"))
+        {
+            victoryAchieved = true;
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -312,7 +339,8 @@ public class MovementBehavior : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision coln){
-        if (coln.gameObject.CompareTag("BreakableWall") && magnitude > 50.0f){
+        if (coln.gameObject.CompareTag("BreakableWall") && magnitude > 50.0f)
+        {
             //coln.gameObject.active = false;
             coln.gameObject.GetComponent<BreakableWallBehaviour>().IncreaseBreakingState();
         }
