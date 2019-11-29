@@ -20,6 +20,5 @@ public class PlayerScore : MonoBehaviour
     {
         scoreText.text = score.ToString();
         finalScoreText.text = score.ToString();
-
     }
 }

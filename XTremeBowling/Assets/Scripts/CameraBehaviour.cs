@@ -22,6 +22,17 @@ public class CameraBehaviour : MonoBehaviour
 
     private void Update()
     {
+        CheckForShootingWireInput();
+    }
+
+    
+    void LateUpdate()
+    {
+        CheckForCameraObstruction();
+    }
+
+    void CheckForShootingWireInput()
+    {
         if (Input.GetMouseButtonDown(1))
         {
             RaycastHit hit;
@@ -34,8 +45,7 @@ public class CameraBehaviour : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void LateUpdate()
+    void CheckForCameraObstruction()
     {
         heading += Input.GetAxis("Mouse X") * Time.deltaTime * 180;
         tilt += Input.GetAxis("Mouse Y") * Time.deltaTime * 180;
@@ -43,7 +53,7 @@ public class CameraBehaviour : MonoBehaviour
         transform.rotation = Quaternion.Euler(tilt, heading, 0);
 
         RaycastHit hit;
-        bool cameraWallHit = Physics.Raycast(player.position + new Vector3(0.0f,2.5f,0.0f), transform.position - (player.position + new Vector3(0.0f, 2.5f, 0.0f)), out hit, 10.0f);
+        bool cameraWallHit = Physics.Raycast(player.position + new Vector3(0.0f, 2.5f, 0.0f), transform.position - (player.position + new Vector3(0.0f, 2.5f, 0.0f)), out hit, 10.0f);
         //Debug.DrawRay(player.position + new Vector3(0.0f, 1.5f, 0.0f), transform.position - (player.position + new Vector3(0.0f, 1.5f, 0.0f)), Color.green);
         if (cameraWallHit)
         {

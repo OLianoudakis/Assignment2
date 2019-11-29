@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * used to be with 3 lives that cracks appear on each life lost until it breaks.
+ * Removed the extra lives because it halted the gameplay experience.
+ * by simply changing the breaking state back to 0 in the inspector
+ * will make it with its full HP again
+ */
+
 public class BreakableWallBehaviour : MonoBehaviour
 {
     public GameObject breakingLevel1;

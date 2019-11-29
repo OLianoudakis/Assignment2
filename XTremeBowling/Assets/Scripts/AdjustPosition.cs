@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*=====================================================
+ =====THIS CLASS IS FOR THE PLAYER EFFECTS OBJECT======
+ =====IT FOLLOWS THE PLAYER AND ADJUST ITS ROTATION====
+ =====BASED ON PLAYER MOVEMENT INTENT. ALSO IT SPANWS==
+ =====PLAYER EFFECTS LIKE BOOSTERS AND PARTICLES=======
+ ======================================================*/
+
 public class AdjustPosition : MonoBehaviour
 {
     public GameObject nitroEngine;
